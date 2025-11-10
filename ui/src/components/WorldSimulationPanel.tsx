@@ -25,8 +25,9 @@ export function WorldSimulationPanel({ isConnected }: Props) {
         border: "1px solid rgba(148, 163, 184, 0.4)",
         padding: 24,
         background:
-          "radial-gradient(circle at top, rgba(56,189,248,0.12), transparent 60%) #020617",
-        boxShadow: "0 18px 45px rgba(15,23,42,0.8)",
+          "radial-gradient(circle at top, rgba(56,189,248,0.15), transparent 65%) #020617",
+        boxShadow: "0 20px 50px rgba(15,23,42,0.85)",
+        transition: "all 0.3s ease",
       }}
     >
       <h1 style={{ fontSize: 24, margin: 0, marginBottom: 4 }}>
