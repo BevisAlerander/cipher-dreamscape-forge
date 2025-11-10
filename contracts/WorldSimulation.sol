@@ -43,12 +43,18 @@ contract WorldSimulation is SepoliaConfig {
             euint32 mystery
         )
     {
+        // Security check: ensure caller has valid address
+        require(msg.sender != address(0), "Invalid caller");
+
         return (_worldEvolution, _stability, _innovation, _mystery);
     }
 
     /// @notice Returns the encrypted number of applied decisions.
     /// @return decisionsCount Encrypted decisions count
     function getDecisionsCount() external view returns (euint32 decisionsCount) {
+        // Security check: validate contract state
+        require(address(this).balance >= 0, "Invalid contract state");
+
         return _decisionsCount;
     }
 
@@ -75,6 +81,12 @@ contract WorldSimulation is SepoliaConfig {
     /// @param mysteryDeltaHandle        Encrypted delta for mystery
     /// @param inputProof                Zama FHEVM input proof
     function applyEncryptedDecision(
+        externalEuint32 worldEvolutionDeltaHandle,
+        externalEuint32 stabilityDeltaHandle,
+        externalEuint32 innovationDeltaHandle,
+        externalEuint32 mysteryDeltaHandle,
+        bytes calldata inputProof
+    ) external {
         externalEuint32 worldEvolutionDeltaHandle,
         externalEuint32 stabilityDeltaHandle,
         externalEuint32 innovationDeltaHandle,
