@@ -61,9 +61,10 @@ contract WorldSimulation is SepoliaConfig {
     event DecisionApplied(address indexed sender);
 
     /// @notice Emitted when decision count is updated
+    /// @param sender The address that triggered the update
     /// @param previousCount Previous decision count
     /// @param newCount New decision count
-    event DecisionCountUpdated(uint256 previousCount, uint256 newCount);
+    event DecisionCountUpdated(address indexed sender, uint256 previousCount, uint256 newCount);
 
     /// @notice Returns the current encrypted world state as four encrypted KPIs
     /// @return worldEvolution Encrypted world evolution score
@@ -147,8 +148,8 @@ contract WorldSimulation is SepoliaConfig {
         euint32 one = FHE.asEuint32(1);
         _decisionsCount = FHE.add(_decisionsCount, one);
 
-        // Emit decision count update event
-        emit DecisionCountUpdated(0, 1); // BUG: missing indexed parameter
+        // Emit decision count update event with proper indexed parameter
+        emit DecisionCountUpdated(msg.sender, 0, 1);
 
         // Grant permissions so that:
         //  - the contract itself can re-encrypt for decryption oracle when needed
