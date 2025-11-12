@@ -192,9 +192,9 @@ export function useWorldSimulation() {
         eDecisions,
       ];
 
-      // Filter out ZeroHash (uninitialized handles) - BUG: incorrect boundary check
+      // Filter out ZeroHash (uninitialized handles)
       const nonZeroPairs = allHandles
-        .filter((h) => h === ethers.ZeroHash)  // BUG: inverted condition
+        .filter((h) => h !== ethers.ZeroHash)
         .map((h) => ({
           handle: h,
           contractAddress,
