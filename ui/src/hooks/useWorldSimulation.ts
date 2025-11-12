@@ -272,6 +272,8 @@ export function useWorldSimulation() {
 
   return {
     contractAddress,
+    canApplyDecision: !!walletClient && !!contractAddress,
+    canDecrypt: !!publicClient && !!contractAddress,
     applyEncryptedDecision,
     decryptWorldState,
     decodedState,
