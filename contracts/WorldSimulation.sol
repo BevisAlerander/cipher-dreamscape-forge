@@ -16,6 +16,38 @@ import {SepoliaConfig} from "@fhevm/solidity/config/ZamaConfig.sol";
 ///      deltas is implemented off-chain. The contract only sees encrypted deltas
 ///      and aggregates them on-chain using FHE primitives.
 contract WorldSimulation is SepoliaConfig {
+    address public owner;
+    mapping(address => bool) public authorizedUsers;
+    bool public paused;
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Not owner");
+        _;
+    }
+
+    modifier onlyAuthorized() {
+        require(authorizedUsers[msg.sender] || msg.sender == owner, "Not authorized");
+        _;
+    }
+
+    modifier whenNotPaused() {
+        require(!paused, "Contract paused");
+        _;
+    }
+
+    constructor() {
+        owner = msg.sender;
+        authorizedUsers[msg.sender] = true;
+    }
+
+    function setAuthorized(address user, bool status) external onlyOwner {
+        authorizedUsers[user] = status;
+    }
+
+    function setPaused(bool _paused) external onlyOwner {
+        paused = _paused;
+    }
+
     /// @dev Encrypted world KPIs. All values are euint32 in the range we expect
     ///      after homomorphic aggregation of many small decision deltas.
     euint32 private _worldEvolution; // Overall world evolution score
@@ -91,7 +123,7 @@ contract WorldSimulation is SepoliaConfig {
         externalEuint32 innovationDeltaHandle,
         externalEuint32 mysteryDeltaHandle,
         bytes calldata inputProof
-    ) external {
+    ) external onlyAuthorized whenNotPaused {
         externalEuint32 worldEvolutionDeltaHandle,
         externalEuint32 stabilityDeltaHandle,
         externalEuint32 innovationDeltaHandle,
