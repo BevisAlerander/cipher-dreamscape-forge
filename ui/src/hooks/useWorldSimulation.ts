@@ -261,8 +261,8 @@ export function useWorldSimulation() {
 
       setMessage("World state decrypted successfully with FHEVM.");
     } catch (e) {
-      console.error("Decryption error:", e);
-      setMessage(`Failed to read/decrypt world state: ${e instanceof Error ? e.message : 'Unknown error'}`);
+      console.error(e);
+      setMessage("Failed to read/decrypt world state.");
     } finally {
       setIsBusy(false);
     }
