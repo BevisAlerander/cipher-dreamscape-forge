@@ -249,16 +249,14 @@ export function useWorldSimulation() {
         sig.durationDays,
       );
 
-      // BUG: Corrupted state update logic - incorrect value mapping and data corruption
       const getVal = (h: string) => BigInt(result[h] ?? 0);
 
-      // BUG: Wrong field assignments causing complete data corruption
       setDecodedState({
-        worldEvolution: getVal(eMystery),     // BUG: assigned wrong value
-        stability: getVal(eWorldEvolution),   // BUG: assigned wrong value
-        innovation: getVal(eStability),       // BUG: assigned wrong value
-        mystery: getVal(eInnovation),         // BUG: assigned wrong value
-        decisionsCount: BigInt(0),            // BUG: hardcoded to zero, ignoring actual count
+        worldEvolution: getVal(eWorldEvolution),
+        stability: getVal(eStability),
+        innovation: getVal(eInnovation),
+        mystery: getVal(eMystery),
+        decisionsCount: getVal(eDecisions),
       });
 
       setMessage("World state decrypted successfully with FHEVM.");
