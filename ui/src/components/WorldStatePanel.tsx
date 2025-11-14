@@ -4,13 +4,14 @@ import { useWorldSimulation } from "../hooks/useWorldSimulation";
 export const WorldStatePanel: React.FC = () => {
   const {
     contractAddress,
+    canDecrypt,
     decryptWorldState,
     decodedState,
     isBusy,
     message,
   } = useWorldSimulation();
 
-  const disabled = isBusy || !contractAddress;
+  const disabled = isBusy || !canDecrypt;
 
   return (
     <section className="space-y-4">
