@@ -93,12 +93,15 @@ export function WorldSimulationPanel({ isConnected }: Props) {
                     min={-10}
                     max={10}
                     value={delta[key]}
-                    onChange={(e) =>
-                      setDelta((prev) => ({
-                        ...prev,
-                        [key]: Number(e.target.value),
-                      }))
-                    }
+                    onChange={(e) => {
+                      const value = Number(e.target.value);
+                      if (value >= -10 && value <= 10) {
+                        setDelta((prev) => ({
+                          ...prev,
+                          [key]: value,
+                        }));
+                      }
+                    }}
                     style={{
                       borderRadius: 8,
                       border: "1px solid rgba(148, 163, 184, 0.5)",
