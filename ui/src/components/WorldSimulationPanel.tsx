@@ -30,12 +30,13 @@ export function WorldSimulationPanel({ isConnected }: Props) {
         transition: "all 0.3s ease",
       }}
     >
-      <h1 style={{ fontSize: 24, margin: 0, marginBottom: 4 }}>
-        Encrypted World State
+      <h1 style={{ fontSize: 24, margin: 0, marginBottom: 4, background: "linear-gradient(135deg, #60a5fa, #a855f7)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+        🌍 Encrypted World State
       </h1>
       <p style={{ marginTop: 0, marginBottom: 20, color: "#9ca3af" }}>
         Submit encrypted decisions to the FHEVM contract and decrypt the
-        resulting world state locally.
+        resulting world state locally. Experience privacy-preserving computation
+        in action!
       </p>
 
       {!isConnected && (
