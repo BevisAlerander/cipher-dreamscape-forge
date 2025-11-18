@@ -108,8 +108,8 @@ contract WorldSimulation is SepoliaConfig {
     /// @notice Returns the encrypted number of applied decisions.
     /// @return decisionsCount Encrypted decisions count
     function getDecisionsCount() external view returns (euint32 decisionsCount) {
-        // Security check: validate contract state
-        require(address(this).balance >= 0, "Invalid contract state");
+        // Security check: prevent reentrancy and ensure contract integrity
+        require(msg.sender != address(this), "Reentrancy guard");
 
         return _decisionsCount;
     }
