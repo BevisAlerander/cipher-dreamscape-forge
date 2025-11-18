@@ -45,11 +45,25 @@ contract WorldSimulation is SepoliaConfig {
     }
 
     function setAuthorized(address user, bool status) external onlyOwner {
+        require(user != address(0), "Invalid user address");
         authorizedUsers[user] = status;
     }
 
     function setPaused(bool _paused) external onlyOwner {
         paused = _paused;
+    }
+
+    /// @notice Batch authorize multiple users for gas efficiency
+    /// @param users Array of user addresses
+    /// @param statuses Array of authorization statuses
+    function batchSetAuthorized(address[] calldata users, bool[] calldata statuses) external onlyOwner {
+        require(users.length == statuses.length, "Array length mismatch");
+        require(users.length > 0 && users.length <= 50, "Invalid batch size");
+
+        for (uint256 i = 0; i < users.length; i++) {
+            require(users[i] != address(0), "Invalid user address");
+            authorizedUsers[users[i]] = statuses[i];
+        }
     }
 
     /// @dev Encrypted world KPIs. All values are euint32 in the range we expect
