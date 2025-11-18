@@ -15,6 +15,10 @@ import {SepoliaConfig} from "@fhevm/solidity/config/ZamaConfig.sol";
 /// @dev The concrete business logic that maps UI sliders / dropdowns to numeric
 ///      deltas is implemented off-chain. The contract only sees encrypted deltas
 ///      and aggregates them on-chain using FHE primitives.
+/// @custom:security Access controlled by onlyAuthorized modifier
+/// @custom:security Emergency pause functionality available
+/// @custom:events DecisionApplied(address) - emitted on successful decision application
+/// @custom:events DecisionCountUpdated(address,uint256,uint256) - tracks decision count changes
 contract WorldSimulation is SepoliaConfig {
     address public owner;
     mapping(address => bool) public authorizedUsers;
