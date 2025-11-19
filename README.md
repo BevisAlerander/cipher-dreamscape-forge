@@ -2,7 +2,7 @@
 
 **FHE-Powered Encrypted World Simulation Game**
 
-[![Demo Video](https://img.shields.io/badge/Demo-Video-blue)](https://github.com/duan-hb/cipher-dreamscape-world/raw/main/cipher-dreamscape-world.mp4)
+[![Demo Video](https://img.shields.io/badge/Demo-Video-blue)](https://github.com/BevisAlerander/cipher-dreamscape-forge/raw/main/cipher-dreamscape-world.mp4)
 [![Vercel Deployment](https://img.shields.io/badge/Deployed-Vercel-black)](https://cipher-dreamscape-world.vercel.app/)
 
 A complete end-to-end example of an **FHE-powered world simulation** where players make encrypted decisions that homomorphically aggregate into a shared encrypted world state.
@@ -26,7 +26,7 @@ This project demonstrates the full **Fully Homomorphic Encryption (FHE)** workfl
 
 ## 📺 Demo Video
 
-[Watch the full demo](https://github.com/duan-hb/cipher-dreamscape-world/raw/main/cipher-dreamscape-world.mp4) to see the complete FHE workflow in action!
+[Watch the full demo](https://github.com/BevisAlerander/cipher-dreamscape-forge/raw/main/cipher-dreamscape-world.mp4) to see the complete FHE workflow in action!
 
 ## 🚀 Live Demo
 
@@ -332,14 +332,210 @@ The project includes `vercel.json` for easy Vercel deployment.
 - **Hardhat Network** - Local blockchain
 - **Sepolia FHEVM** - Testnet with real FHE
 
+## 🔍 Advanced Usage
+
+### Custom Decision Parameters
+
+The world simulation supports dynamic decision parameters. You can modify the decision delta ranges and add new KPI categories:
+
+```typescript
+// In WorldSimulationPanel.tsx
+const customRanges = {
+  worldEvolution: { min: -20, max: 20 },
+  stability: { min: -15, max: 15 },
+  innovation: { min: -10, max: 25 },
+  mystery: { min: -5, max: 30 },
+};
+```
+
+### Multi-Player Scenarios
+
+This architecture supports multiple players contributing to the same world state:
+
+1. **Individual Privacy**: Each player's decisions remain encrypted
+2. **Collective Impact**: Decisions aggregate homomorphically
+3. **Fair Contribution**: All players can decrypt final results
+4. **Scalable Design**: No limit on number of contributors
+
+### Gas Optimization Strategies
+
+The contract implements several gas optimization techniques:
+
+- **Batch Operations**: `batchSetAuthorized()` for multiple authorizations
+- **Efficient Storage**: Minimal storage reads/writes
+- **Optimized Events**: Indexed parameters for efficient filtering
+- **Input Validation**: Prevents unnecessary operations
+
+## 🧪 Development Guide
+
+### Running Tests
+
+```bash
+# Run all tests
+npm test
+
+# Run specific test file
+npx hardhat test test/WorldSimulation.ts
+
+# Run with gas reporting
+npx hardhat test --gas
+
+# Run Sepolia FHEVM tests
+npx hardhat test --network sepolia test/WorldSimulationSepolia.ts
+```
+
+### Code Quality
+
+This project maintains high code quality standards:
+
+- **ESLint**: JavaScript/TypeScript linting
+- **Prettier**: Code formatting
+- **TypeScript**: Strict type checking
+- **Solidity Linter**: Contract code quality
+
+### Debugging FHE Operations
+
+```typescript
+// Enable FHE debug logging
+const fhevmInstance = new FhevmInstance({
+  networkUrl: "https://sepolia-fhevm.zama.ai",
+  debug: true, // Enable debug mode
+});
+
+// Monitor encryption operations
+input.on('encrypt', (progress) => {
+  console.log(`Encryption progress: ${progress}%`);
+});
+```
+
+## 🚀 Production Deployment
+
+### Environment Variables
+
+Create a `.env` file with:
+
+```bash
+# WalletConnect
+WALLETCONNECT_PROJECT_ID=your_project_id
+
+# FHEVM Configuration
+FHEVM_NETWORK_URL=https://sepolia-fhevm.zama.ai
+FHEVM_CONTRACT_ADDRESS=your_deployed_contract
+
+# Vercel Deployment
+VERCEL_TOKEN=your_vercel_token
+```
+
+### CI/CD Pipeline
+
+The project includes GitHub Actions for automated testing and deployment:
+
+- **Test Suite**: Runs on every PR
+- **Security Audit**: Automated vulnerability scanning
+- **Deployment**: Automatic Vercel deployment on main branch
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+#### Wallet Connection Issues
+```bash
+# Clear wallet cache
+localStorage.clear();
+
+# Reset wallet connection
+await disconnect();
+await connect();
+```
+
+#### FHE Decryption Failures
+- Ensure proper network selection (Sepolia FHEVM)
+- Check wallet permissions
+- Verify contract deployment
+
+#### Build Errors
+```bash
+# Clean and rebuild
+rm -rf node_modules ui/node_modules
+npm install && cd ui && npm install
+npm run build
+```
+
+### Performance Optimization
+
+- **Bundle Splitting**: Dynamic imports for FHE libraries
+- **Code Splitting**: Route-based splitting
+- **Image Optimization**: WebP format with fallbacks
+- **Caching**: Service worker for offline functionality
+
+## 📊 Analytics & Monitoring
+
+### Contract Events
+
+Monitor important contract events:
+
+```javascript
+// Listen for decision applications
+contract.on("DecisionApplied", (sender) => {
+  console.log(`Decision applied by: ${sender}`);
+});
+
+// Monitor decision count updates
+contract.on("DecisionCountUpdated", (sender, previous, current) => {
+  console.log(`Count updated: ${previous} -> ${current}`);
+});
+```
+
+### Performance Metrics
+
+Track application performance:
+
+- **Encryption Time**: Time to encrypt decision deltas
+- **Transaction Time**: Block confirmation time
+- **Decryption Time**: Time to decrypt world state
+- **UI Responsiveness**: Component render times
+
+## 🌟 Future Enhancements
+
+### Planned Features
+
+- **Multi-Chain Support**: Support for additional FHEVM networks
+- **Advanced KPIs**: More complex world state calculations
+- **Player Profiles**: Persistent player statistics
+- **Tournament Mode**: Competitive world-building challenges
+- **NFT Integration**: World state as NFTs
+- **Cross-Game Compatibility**: Interoperable world states
+
+### Research Directions
+
+- **Privacy-Preserving Gaming**: Novel applications of FHE in gaming
+- **Scalable FHE**: Performance optimizations for larger datasets
+- **Interoperability**: Cross-chain encrypted state transfers
+- **Governance**: DAO-based world evolution decisions
+
 ## 📚 Learn More
 
+### FHE Resources
 - [FHEVM Documentation](https://docs.zama.ai/fhevm)
 - [Zama FHEVM GitHub](https://github.com/zama-ai/fhevm)
+- [Homomorphic Encryption Overview](https://en.wikipedia.org/wiki/Homomorphic_encryption)
+
+### Web3 Development
 - [RainbowKit Docs](https://www.rainbowkit.com/)
 - [Wagmi Documentation](https://wagmi.sh/)
+- [Vite Documentation](https://vitejs.dev/)
+- [Hardhat Documentation](https://hardhat.org/)
+
+### UI/UX Resources
+- [Tailwind CSS](https://tailwindcss.com/)
+- [shadcn/ui](https://ui.shadcn.com/)
+- [React Best Practices](https://react.dev/)
 
 ## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+
+### Development Workflow
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/amazing-feature`)
@@ -347,12 +543,36 @@ The project includes `vercel.json` for easy Vercel deployment.
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
+### Code Standards
+
+- Follow existing code style and patterns
+- Add tests for new functionality
+- Update documentation as needed
+- Ensure all tests pass
+
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
+## 🙏 Acknowledgments
+
+- **Zama** for the FHEVM platform
+- **RainbowKit** for wallet connection UI
+- **shadcn/ui** for beautiful components
+- **Vercel** for hosting and deployment
+
 ---
 
-**Built with ❤️ using FHEVM - The future of private blockchain computation**
+**Built with ❤️ using FHEVM - Pioneering the future of private blockchain computation**
+
+## 📞 Support
+
+- **Issues**: [GitHub Issues](https://github.com/BevisAlerander/cipher-dreamscape-forge/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/BevisAlerander/cipher-dreamscape-forge/discussions)
+- **Discord**: Join our community Discord server
+
+---
+
+*This project represents a significant advancement in privacy-preserving blockchain applications, demonstrating the practical viability of homomorphic encryption in real-world decentralized systems.*
 
 
