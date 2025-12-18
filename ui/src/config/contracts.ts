@@ -43,6 +43,25 @@ export const WorldSimulationABI = [
     outputs: [],
     stateMutability: "nonpayable",
     type: "function"
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: "address", name: "sender", type: "address" },
+      { indexed: false, internalType: "uint256", name: "timestamp", type: "uint256" }
+    ],
+    name: "DecisionApplied",
+    type: "event"
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: "address", name: "sender", type: "address" },
+      { indexed: false, internalType: "uint256", name: "previousCount", type: "uint256" },
+      { indexed: false, internalType: "uint256", name: "newCount", type: "uint256" }
+    ],
+    name: "DecisionCountUpdated",
+    type: "event"
   }
 ] as const;
 

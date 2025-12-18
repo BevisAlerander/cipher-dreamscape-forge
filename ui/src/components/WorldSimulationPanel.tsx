@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { useWorldSimulation } from "../hooks/useWorldSimulation";
+import { DecisionScenarioSelector } from "./DecisionScenarioSelector";
+import type { DecisionOption } from "../config/decisionScenarios";
 
 type Props = {
   isConnected: boolean;
@@ -12,11 +14,22 @@ export function WorldSimulationPanel({ isConnected }: Props) {
     innovation: 7,
     mystery: 2,
   });
+  const [useScenario, setUseScenario] = useState(true);
 
   const { contractAddress, applyEncryptedDecision, isBusy, message } =
     useWorldSimulation();
 
   const disabled = !isConnected || isBusy;
+
+  const handleScenarioSelect = (option: DecisionOption) => {
+    setDelta({
+      worldEvolution: option.worldEvolution,
+      stability: option.stability,
+      innovation: option.innovation,
+      mystery: option.mystery,
+    });
+    setUseScenario(true);
+  };
 
   return (
     <div
@@ -56,12 +69,57 @@ export function WorldSimulationPanel({ isConnected }: Props) {
       )}
 
       <section>
-        <div>
-          <h2 style={{ fontSize: 16, marginBottom: 12 }}>Decision Payload</h2>
-          <p style={{ fontSize: 13, color: "#9ca3af", marginTop: 0 }}>
-            Adjust the cleartext deltas that will be encrypted and submitted to
-            the contract.
-          </p>
+        <div style={{ marginBottom: 16, display: "flex", gap: 8 }}>
+          <button
+            onClick={() => setUseScenario(true)}
+            disabled={disabled}
+            style={{
+              padding: "6px 12px",
+              borderRadius: 6,
+              border: useScenario ? "2px solid #60a5fa" : "1px solid rgba(148, 163, 184, 0.3)",
+              background: useScenario ? "rgba(96, 165, 250, 0.1)" : "transparent",
+              color: "#e5e7eb",
+              fontSize: 13,
+              cursor: disabled ? "not-allowed" : "pointer",
+              opacity: disabled ? 0.5 : 1,
+            }}
+          >
+            Scenario Decision
+          </button>
+          <button
+            onClick={() => setUseScenario(false)}
+            disabled={disabled}
+            style={{
+              padding: "6px 12px",
+              borderRadius: 6,
+              border: !useScenario ? "2px solid #60a5fa" : "1px solid rgba(148, 163, 184, 0.3)",
+              background: !useScenario ? "rgba(96, 165, 250, 0.1)" : "transparent",
+              color: "#e5e7eb",
+              fontSize: 13,
+              cursor: disabled ? "not-allowed" : "pointer",
+              opacity: disabled ? 0.5 : 1,
+            }}
+          >
+            Manual Input
+          </button>
+        </div>
+
+        {useScenario ? (
+          <DecisionScenarioSelector 
+            onSelectOption={handleScenarioSelect}
+            disabled={disabled}
+          />
+        ) : (
+          <div>
+            <h2 style={{ fontSize: 16, marginBottom: 12 }}>Decision Payload</h2>
+            <p style={{ fontSize: 13, color: "#9ca3af", marginTop: 0 }}>
+              Adjust the cleartext deltas that will be encrypted and submitted to
+              the contract.
+            </p>
+          </div>
+        )}
+
+        {!useScenario && (
           <div
             style={{
               display: "grid",
@@ -115,15 +173,50 @@ export function WorldSimulationPanel({ isConnected }: Props) {
               ),
             )}
           </div>
+        )}
 
+        {delta.worldEvolution !== 0 || delta.stability !== 0 || delta.innovation !== 0 || delta.mystery !== 0 ? (
           <div
             style={{
               marginTop: 18,
               display: "flex",
               gap: 12,
               flexWrap: "wrap",
+              alignItems: "center",
             }}
           >
+            {useScenario && (
+              <div style={{ 
+                fontSize: 13, 
+                color: "#9ca3af",
+                padding: "8px 12px",
+                borderRadius: 8,
+                background: "rgba(15, 23, 42, 0.6)",
+                border: "1px solid rgba(148, 163, 184, 0.2)",
+              }}>
+                Current Selection Impact: 
+                {delta.worldEvolution !== 0 && (
+                  <span style={{ marginLeft: 8, color: "#a855f7" }}>
+                    Evolution {delta.worldEvolution > 0 ? "+" : ""}{delta.worldEvolution}
+                  </span>
+                )}
+                {delta.stability !== 0 && (
+                  <span style={{ marginLeft: 8, color: "#22c55e" }}>
+                    Stability {delta.stability > 0 ? "+" : ""}{delta.stability}
+                  </span>
+                )}
+                {delta.innovation !== 0 && (
+                  <span style={{ marginLeft: 8, color: "#22d3ee" }}>
+                    Innovation {delta.innovation > 0 ? "+" : ""}{delta.innovation}
+                  </span>
+                )}
+                {delta.mystery !== 0 && (
+                  <span style={{ marginLeft: 8, color: "#f97316" }}>
+                    Mystery {delta.mystery > 0 ? "+" : ""}{delta.mystery}
+                  </span>
+                )}
+              </div>
+            )}
             <button
               disabled={disabled || !contractAddress}
               onClick={() =>
@@ -150,21 +243,20 @@ export function WorldSimulationPanel({ isConnected }: Props) {
               {isBusy ? "Submitting..." : "Encrypt & Submit Decision"}
             </button>
           </div>
+        ) : null}
 
-          {message && (
-            <p
-              style={{
-                marginTop: 12,
-                fontSize: 12,
-                color: "#a5b4fc",
-                minHeight: 18,
-              }}
-            >
-              {message}
-            </p>
-          )}
-        </div>
-
+        {message && (
+          <p
+            style={{
+              marginTop: 12,
+              fontSize: 12,
+              color: "#a5b4fc",
+              minHeight: 18,
+            }}
+          >
+            {message}
+          </p>
+        )}
       </section>
     </div>
   );

@@ -4,10 +4,12 @@
   "description": "Cipher Dreamscape World - FHE-powered world simulation (contracts + UI)",
   "main": "index.js",
   "scripts": {
+    "compile": "hardhat compile",
     "test": "hardhat test",
     "test:sepolia": "hardhat test --network sepolia test/WorldSimulationSepolia.ts",
     "lint": "echo \"No linter configured\"",
-    "deploy": "hardhat deploy --network sepolia"
+    "deploy": "hardhat deploy --network sepolia",
+    "deploy:local": "hardhat deploy --network localhost"
   },
   "keywords": [],
   "author": "",

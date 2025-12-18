@@ -76,13 +76,22 @@ contract WorldSimulation is SepoliaConfig {
 
     /// @notice Emitted whenever a new encrypted decision has been applied
     /// @param sender The address that submitted the decision
-    event DecisionApplied(address indexed sender);
+    /// @param timestamp The block timestamp when decision was applied
+    event DecisionApplied(
+        address indexed sender,
+        uint256 timestamp
+    );
 
     /// @notice Emitted when decision count is updated
     /// @param sender The address that triggered the update
     /// @param previousCount Previous decision count
     /// @param newCount New decision count
     event DecisionCountUpdated(address indexed sender, uint256 previousCount, uint256 newCount);
+
+    /// @notice Emitted when a milestone is reached
+    /// @param milestoneType Type of milestone (e.g., "WorldEvolution", "Stability")
+    /// @param threshold The threshold that was reached
+    event WorldMilestoneReached(string milestoneType, uint256 threshold);
 
     /// @notice Returns the current encrypted world state as four encrypted KPIs
     /// @return worldEvolution Encrypted world evolution score
@@ -143,12 +152,6 @@ contract WorldSimulation is SepoliaConfig {
         externalEuint32 mysteryDeltaHandle,
         bytes calldata inputProof
     ) external onlyAuthorized whenNotPaused {
-        externalEuint32 worldEvolutionDeltaHandle,
-        externalEuint32 stabilityDeltaHandle,
-        externalEuint32 innovationDeltaHandle,
-        externalEuint32 mysteryDeltaHandle,
-        bytes calldata inputProof
-    ) external {
         // Recover encrypted deltas from external handles
         euint32 worldEvolutionDelta = FHE.fromExternal(worldEvolutionDeltaHandle, inputProof);
         euint32 stabilityDelta = FHE.fromExternal(stabilityDeltaHandle, inputProof);
@@ -166,8 +169,10 @@ contract WorldSimulation is SepoliaConfig {
         euint32 one = FHE.asEuint32(1);
         _decisionsCount = FHE.add(_decisionsCount, one);
 
-        // Emit decision count update event with proper indexed parameter
-        emit DecisionCountUpdated(msg.sender, 0, 1);
+        // Emit decision with metadata for history tracking
+        // Note: We cannot decrypt the count here, so we emit a generic event
+        // Frontend will track the actual count by listening to events
+        emit DecisionApplied(msg.sender, block.timestamp);
 
         // Grant permissions so that:
         //  - the contract itself can re-encrypt for decryption oracle when needed
@@ -183,8 +188,6 @@ contract WorldSimulation is SepoliaConfig {
         FHE.allow(_innovation, msg.sender);
         FHE.allow(_mystery, msg.sender);
         FHE.allow(_decisionsCount, msg.sender);
-
-        emit DecisionApplied(msg.sender);
     }
 }
 

@@ -4,6 +4,8 @@ import { useAccount } from "wagmi";
 import { Logo } from "@/components/Logo";
 import { WorldSimulationPanel } from "@/components/WorldSimulationPanel";
 import { WorldStatePanel } from "@/components/WorldStatePanel";
+// import { WorldTimeline } from "@/components/WorldTimeline"; // TODO: Re-enable when feature is fully implemented
+import { PlayerRanking } from "@/components/PlayerRanking";
 import heroLandscape from "@/assets/hero-landscape.jpg";
 
 const Index: React.FC = () => {
@@ -53,15 +55,31 @@ const Index: React.FC = () => {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-10 md:py-16">
-        <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
-          {/* Decision Panel + FHE wiring */}
-          <div className="animate-float" style={{ animationDelay: "0.2s" }}>
-            <WorldSimulationPanel isConnected={isConnected} />
+        <div className="grid lg:grid-cols-2 gap-8 max-w-7xl mx-auto">
+          {/* Left Column */}
+          <div className="space-y-8">
+            {/* Decision Panel + FHE wiring */}
+            <div className="animate-float" style={{ animationDelay: "0.2s" }}>
+              <WorldSimulationPanel isConnected={isConnected} />
+            </div>
           </div>
 
-          {/* World State panel (concentric rings + stats) */}
-          <div className="animate-float" style={{ animationDelay: "0.4s" }}>
-            <WorldStatePanel />
+          {/* Right Column */}
+          <div className="space-y-8">
+            {/* World State panel (concentric rings + stats) */}
+            <div className="animate-float" style={{ animationDelay: "0.4s" }}>
+              <WorldStatePanel />
+            </div>
+
+            {/* World Timeline - TODO: Re-enable when feature is fully implemented */}
+            {/* <div className="animate-float" style={{ animationDelay: "0.6s" }}>
+              <WorldTimeline />
+            </div> */}
+
+            {/* Player Ranking */}
+            <div className="animate-float" style={{ animationDelay: "0.6s" }}>
+              <PlayerRanking />
+            </div>
           </div>
         </div>
       </main>

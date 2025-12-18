@@ -191,6 +191,5 @@ describe("WorldSimulation (Sepolia wiring smoke test)", function () {
 
     expect(evolution).to.be.a("number");
   });
-}
-
+});
 

@@ -90,9 +90,8 @@ export function useFhevmWagmi() {
   }, []);
 
   const initializeFhevm = useCallback(async () => {
-    // Only initialize the browser FHEVM SDK when we are on Sepolia FHEVM.
-    // On local Hardhat (31337) or any other chain, we skip SDK init entirely.
-    if (chainId !== 11155111) {
+    // Initialize FHEVM SDK for Sepolia, or try mock for local Hardhat
+    if (chainId !== 11155111 && chainId !== 31337) {
       return false;
     }
 
@@ -118,6 +117,83 @@ export function useFhevmWagmi() {
         throw new Error("Failed to load Zama Relayer SDK from CDN");
       }
 
+      // For local Hardhat, try to use mock FHEVM
+      if (chainId === 31337) {
+        try {
+          // Try to dynamically import mock utils
+          const { MockFhevmInstance } = await import("@fhevm/mock-utils");
+          const { JsonRpcProvider } = await import("ethers");
+          
+          const rpcUrl = "http://127.0.0.1:8545";
+          const provider = new JsonRpcProvider(rpcUrl);
+          
+          // Get FHEVM relayer metadata from Hardhat node using RPC call (same as community-voting)
+          let metadata: any = null;
+          try {
+            // First check if this is a Hardhat node
+            const version = await provider.send("web3_clientVersion", []);
+            if (typeof version === "string" && version.toLowerCase().includes("hardhat")) {
+              // Try to get FHEVM metadata via RPC call
+              metadata = await provider.send("fhevm_relayer_metadata", []);
+              
+              // Validate metadata structure
+              if (
+                metadata &&
+                typeof metadata === "object" &&
+                typeof metadata.ACLAddress === "string" &&
+                metadata.ACLAddress.startsWith("0x") &&
+                typeof metadata.InputVerifierAddress === "string" &&
+                metadata.InputVerifierAddress.startsWith("0x") &&
+                typeof metadata.KMSVerifierAddress === "string" &&
+                metadata.KMSVerifierAddress.startsWith("0x")
+              ) {
+                console.log("FHEVM metadata retrieved from Hardhat node:", metadata);
+              } else {
+                console.warn("Invalid FHEVM metadata structure, using defaults");
+                metadata = null;
+              }
+            }
+          } catch (e) {
+            console.warn("Could not get FHEVM metadata from Hardhat node:", e);
+            metadata = null;
+          }
+
+          const mockInstance = await MockFhevmInstance.create(
+            provider,
+            provider,
+            metadata
+              ? {
+                  aclContractAddress: metadata.ACLAddress,
+                  chainId: 31337,
+                  gatewayChainId: 55815,
+                  inputVerifierContractAddress: metadata.InputVerifierAddress,
+                  kmsContractAddress: metadata.KMSVerifierAddress,
+                  verifyingContractAddressDecryption: "0x5ffdaAB0373E62E2ea2944776209aEf29E631A64",
+                  verifyingContractAddressInputVerification: "0x812b06e1CDCE800494b79fFE4f925A504a9A9810",
+                }
+              : {
+                  aclContractAddress: "0x50157CFfD6bBFA2DECe204a89ec419c23ef5755D",
+                  chainId: 31337,
+                  gatewayChainId: 55815,
+                  inputVerifierContractAddress: "0x901F8942346f7AB3a01F6D7613119Bca447Bb030",
+                  kmsContractAddress: "0x1364cBBf2cDF5032C47d8226a6f6FBD2AFCDacAC",
+                  verifyingContractAddressDecryption: "0x5ffdaAB0373E62E2ea2944776209aEf29E631A64",
+                  verifyingContractAddressInputVerification: "0x812b06e1CDCE800494b79fFE4f925A504a9A9810",
+                }
+          );
+          
+          setInstance(mockInstance);
+          setIsInitialized(true);
+          console.log("FHEVM Mock instance created for local network");
+          return true;
+        } catch (mockError) {
+          console.warn("Failed to create FHEVM mock instance:", mockError);
+          setError("Local FHEVM mock not available. Install @fhevm/mock-utils or use Sepolia network.");
+          return false;
+        }
+      }
+
+      // For Sepolia, use real SDK
       const { initSDK, createInstance, SepoliaConfig } = window.relayerSDK;
 
       if (!window.relayerSDK.__initialized__) {
@@ -147,7 +223,7 @@ export function useFhevmWagmi() {
 
   useEffect(() => {
     if (
-      chainId === 11155111 &&
+      (chainId === 11155111 || chainId === 31337) &&
       isConnected &&
       address &&
       walletClient &&

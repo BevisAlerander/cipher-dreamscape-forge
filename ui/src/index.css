@@ -48,4 +48,78 @@ button {
   font-family: inherit;
 }
 
+/* World State Animation */
+.ring-animation-0 {
+  animation: pulse-ring-0 3s ease-in-out infinite;
+}
+
+.ring-animation-1 {
+  animation: pulse-ring-1 3s ease-in-out infinite 0.2s;
+}
+
+.ring-animation-2 {
+  animation: pulse-ring-2 3s ease-in-out infinite 0.4s;
+}
+
+.ring-animation-3 {
+  animation: pulse-ring-3 3s ease-in-out infinite 0.6s;
+}
+
+@keyframes pulse-ring-0 {
+  0%, 100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  50% {
+    transform: scale(1.02);
+    filter: brightness(1.2);
+  }
+}
+
+@keyframes pulse-ring-1 {
+  0%, 100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  50% {
+    transform: scale(1.015);
+    filter: brightness(1.15);
+  }
+}
+
+@keyframes pulse-ring-2 {
+  0%, 100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  50% {
+    transform: scale(1.01);
+    filter: brightness(1.1);
+  }
+}
+
+@keyframes pulse-ring-3 {
+  0%, 100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  50% {
+    transform: scale(1.005);
+    filter: brightness(1.05);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
 

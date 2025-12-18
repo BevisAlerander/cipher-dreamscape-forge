@@ -113,36 +113,45 @@ export const WorldStatePanel: React.FC = () => {
                 },
               ];
 
-              // Shuffle order so attributes appear in different ring positions
-              const shuffled = [...rings].sort(() => Math.random() - 0.5);
+              // Fixed order to avoid position changes on each render
+              const orderedRings = [
+                rings.find(r => r.key === "worldEvolution")!,
+                rings.find(r => r.key === "stability")!,
+                rings.find(r => r.key === "innovation")!,
+                rings.find(r => r.key === "mystery")!,
+              ].filter(Boolean);
 
-              return shuffled.map((ring, index) => {
+              return orderedRings.map((ring, index) => {
                 const baseDiameter = 80; // innermost ring diameter
-                const step = 14; // distance between rings
+                const step = 18; // distance between rings
                 const diameter = baseDiameter + index * step * 2;
 
                 const numeric = Number(ring.value);
                 const normalized =
                   Number.isFinite(numeric) && numeric > 0
-                    ? Math.min(1, numeric / 100)
-                    : 0.3;
+                    ? Math.min(1, Math.max(0.2, numeric / 100))
+                    : 0.2;
+
+                // Calculate pulse animation delay
+                const pulseDelay = index * 0.2;
 
                 return (
                   <div
                     key={ring.key}
                     title={`${ring.label}: ${String(ring.value)}`}
+                    className={`ring-animation-${index}`}
                     style={{
                       position: "absolute",
                       width: diameter,
                       height: diameter,
                       borderRadius: "999px",
-                      borderWidth: 1,
+                      borderWidth: 2,
                       borderStyle: "solid",
                       borderColor: ring.color,
                       opacity: normalized,
-                      boxShadow: `0 0 12px ${ring.color}`,
+                      boxShadow: `0 0 ${12 + normalized * 8}px ${ring.color}, inset 0 0 ${8 + normalized * 4}px ${ring.color}`,
                       transition:
-                        "opacity 0.35s ease-out, box-shadow 0.35s ease-out",
+                        "opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.6s cubic-bezier(0.4, 0, 0.2, 1), transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)",
                     }}
                   />
                 );

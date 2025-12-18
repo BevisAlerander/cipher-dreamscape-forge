@@ -1,9 +1,10 @@
 import { expect } from "chai";
-import { ethers } from "hardhat";
+import { ethers, fhevm } from "hardhat";
 import { WorldSimulation } from "../typechain-types";
 
 describe("End-to-End Integration Tests", function () {
   let worldSimulation: WorldSimulation;
+  let worldSimulationAddress: string;
   let owner: any;
   let user1: any;
   let user2: any;
@@ -14,26 +15,76 @@ describe("End-to-End Integration Tests", function () {
     const WorldSimulation = await ethers.getContractFactory("WorldSimulation");
     worldSimulation = await WorldSimulation.deploy();
     await worldSimulation.waitForDeployment();
+    worldSimulationAddress = await worldSimulation.getAddress();
 
     // Authorize users
     await worldSimulation.setAuthorized(user1.address, true);
     await worldSimulation.setAuthorized(user2.address, true);
   });
 
+  // Helper function to create encrypted input with zeros
+  async function createZeroEncryptedInput(user: any) {
+    if (fhevm.isMock) {
+      const encryptedInput = await fhevm
+        .createEncryptedInput(worldSimulationAddress, user.address)
+        .add32(0)
+        .add32(0)
+        .add32(0)
+        .add32(0)
+        .encrypt();
+      return encryptedInput;
+    }
+    return null;
+  }
+
   describe("Complete User Journey", function () {
     it("Should handle multiple users making decisions and aggregating world state", async function () {
-      // User 1 makes a decision
-      const zeroHandle = ethers.ZeroHash;
-      const emptyProof = "0x";
+      if (!fhevm.isMock) {
+        this.skip(); // Skip on non-mock networks as we need proper FHE encryption
+        return;
+      }
 
-      await expect(worldSimulation.connect(user1).applyEncryptedDecision(
-        zeroHandle, zeroHandle, zeroHandle, zeroHandle, emptyProof
-      )).to.emit(worldSimulation, "DecisionApplied").withArgs(user1.address);
+      // User 1 makes a decision with encrypted zeros
+      const encrypted1 = await createZeroEncryptedInput(user1);
+      if (!encrypted1) {
+        this.skip();
+        return;
+      }
+
+      const tx1 = await worldSimulation.connect(user1).applyEncryptedDecision(
+        encrypted1.handles[0],
+        encrypted1.handles[1],
+        encrypted1.handles[2],
+        encrypted1.handles[3],
+        encrypted1.inputProof
+      );
+      const receipt1 = await tx1.wait();
+      const block1 = await ethers.provider.getBlock(receipt1!.blockNumber);
+      
+      await expect(tx1)
+        .to.emit(worldSimulation, "DecisionApplied")
+        .withArgs(user1.address, block1!.timestamp);
 
       // User 2 makes a decision
-      await expect(worldSimulation.connect(user2).applyEncryptedDecision(
-        zeroHandle, zeroHandle, zeroHandle, zeroHandle, emptyProof
-      )).to.emit(worldSimulation, "DecisionApplied").withArgs(user2.address);
+      const encrypted2 = await createZeroEncryptedInput(user2);
+      if (!encrypted2) {
+        this.skip();
+        return;
+      }
+
+      const tx2 = await worldSimulation.connect(user2).applyEncryptedDecision(
+        encrypted2.handles[0],
+        encrypted2.handles[1],
+        encrypted2.handles[2],
+        encrypted2.handles[3],
+        encrypted2.inputProof
+      );
+      const receipt2 = await tx2.wait();
+      const block2 = await ethers.provider.getBlock(receipt2!.blockNumber);
+      
+      await expect(tx2)
+        .to.emit(worldSimulation, "DecisionApplied")
+        .withArgs(user2.address, block2!.timestamp);
 
       // Verify decision count
       const decisions = await worldSimulation.getDecisionsCount();
@@ -48,34 +99,68 @@ describe("End-to-End Integration Tests", function () {
     });
 
     it("Should properly handle authorization and access control", async function () {
-      const zeroHandle = ethers.ZeroHash;
-      const emptyProof = "0x";
+      if (!fhevm.isMock) {
+        this.skip();
+        return;
+      }
 
       // Remove authorization for user2
       await worldSimulation.setAuthorized(user2.address, false);
 
       // User1 should still work
+      const encrypted1 = await createZeroEncryptedInput(user1);
+      if (!encrypted1) {
+        this.skip();
+        return;
+      }
+
       await expect(worldSimulation.connect(user1).applyEncryptedDecision(
-        zeroHandle, zeroHandle, zeroHandle, zeroHandle, emptyProof
+        encrypted1.handles[0],
+        encrypted1.handles[1],
+        encrypted1.handles[2],
+        encrypted1.handles[3],
+        encrypted1.inputProof
       )).to.not.be.reverted;
 
       // User2 should be rejected
+      const encrypted2 = await createZeroEncryptedInput(user2);
+      if (!encrypted2) {
+        this.skip();
+        return;
+      }
+
       await expect(worldSimulation.connect(user2).applyEncryptedDecision(
-        zeroHandle, zeroHandle, zeroHandle, zeroHandle, emptyProof
+        encrypted2.handles[0],
+        encrypted2.handles[1],
+        encrypted2.handles[2],
+        encrypted2.handles[3],
+        encrypted2.inputProof
       )).to.be.revertedWith("Not authorized");
     });
 
     it("Should support emergency pause functionality", async function () {
-      const zeroHandle = ethers.ZeroHash;
-      const emptyProof = "0x";
+      if (!fhevm.isMock) {
+        this.skip();
+        return;
+      }
 
       // Pause the contract
       await worldSimulation.setPaused(true);
       expect(await worldSimulation.paused()).to.be.true;
 
       // All operations should be blocked
+      const encrypted1 = await createZeroEncryptedInput(user1);
+      if (!encrypted1) {
+        this.skip();
+        return;
+      }
+
       await expect(worldSimulation.connect(user1).applyEncryptedDecision(
-        zeroHandle, zeroHandle, zeroHandle, zeroHandle, emptyProof
+        encrypted1.handles[0],
+        encrypted1.handles[1],
+        encrypted1.handles[2],
+        encrypted1.handles[3],
+        encrypted1.inputProof
       )).to.be.revertedWith("Contract paused");
 
       // Even reading should be restricted (depending on implementation)
@@ -87,7 +172,11 @@ describe("End-to-End Integration Tests", function () {
 
       // Operations should work again
       await expect(worldSimulation.connect(user1).applyEncryptedDecision(
-        zeroHandle, zeroHandle, zeroHandle, zeroHandle, emptyProof
+        encrypted1.handles[0],
+        encrypted1.handles[1],
+        encrypted1.handles[2],
+        encrypted1.handles[3],
+        encrypted1.inputProof
       )).to.not.be.reverted;
     });
 
