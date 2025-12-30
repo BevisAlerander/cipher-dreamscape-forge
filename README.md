@@ -2,8 +2,8 @@
 
 **FHE-Powered Encrypted World Simulation Game**
 
-[![Demo Video](https://img.shields.io/badge/Demo-Video-blue)](https://github.com/BevisAlerander/cipher-dreamscape-forge/raw/main/cipher-dreamscape-world.mp4)
-[![Vercel Deployment](https://img.shields.io/badge/Deployed-Vercel-black)](https://cipher-dreamscape-world.vercel.app/)
+[![Demo Video](https://img.shields.io/badge/Demo-Video-blue)](https://youtu.be/H2uxUyfviXE)
+[![Vercel Deployment](https://img.shields.io/badge/Deployed-Vercel-black)](https://cipher-dreamscape-world-pro.vercel.app/)
 
 A complete end-to-end example of an **FHE-powered world simulation** where players make encrypted decisions that homomorphically aggregate into a shared encrypted world state.
 
